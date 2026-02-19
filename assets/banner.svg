@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1b1b1b"/>
+      <stop offset="100%" style="stop-color:#2a2a3d"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#575ECF"/>
+      <stop offset="100%" style="stop-color:#7B80E0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="300" rx="16" fill="url(#bg)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="780" cy="60" r="120" fill="#575ECF" opacity="0.06"/>
+  <circle cx="120" cy="240" r="80" fill="#575ECF" opacity="0.04"/>
+  <rect x="50" y="260" width="800" height="2" rx="1" fill="url(#accent)" opacity="0.3"/>
+
+  <!-- Map pin icon -->
+  <g transform="translate(60, 65)">
+    <circle cx="55" cy="55" r="52" fill="none" stroke="#575ECF" stroke-width="3" opacity="0.8"/>
+    <path d="M55 20c-15 0-27 12-27 27 0 20 27 43 27 43s27-23 27-43c0-15-12-27-27-27zm0 37c-6 0-10-4-10-10s4-10 10-10 10 4 10 10-4 10-10 10z" fill="#575ECF" opacity="0.9"/>
+  </g>
+
+  <!-- Title -->
+  <text x="195" y="105" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="42" font-weight="700" fill="#FFFFFF" letter-spacing="-1">Google Maps Scraper</text>
+
+  <!-- Subtitle -->
+  <text x="195" y="140" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="18" fill="#c5c1b9">Extract business data from Google Maps search results</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(195, 160)">
+    <rect x="0" y="0" width="110" height="28" rx="14" fill="#575ECF" opacity="0.2"/>
+    <text x="55" y="19" font-family="system-ui, sans-serif" font-size="12" fill="#7B80E0" text-anchor="middle" font-weight="600">Cross-Platform</text>
+
+    <rect x="120" y="0" width="95" height="28" rx="14" fill="#575ECF" opacity="0.2"/>
+    <text x="167" y="19" font-family="system-ui, sans-serif" font-size="12" fill="#7B80E0" text-anchor="middle" font-weight="600">Crash-Safe</text>
+
+    <rect x="225" y="0" width="110" height="28" rx="14" fill="#575ECF" opacity="0.2"/>
+    <text x="280" y="19" font-family="system-ui, sans-serif" font-size="12" fill="#7B80E0" text-anchor="middle" font-weight="600">Headless Mode</text>
+
+    <rect x="345" y="0" width="95" height="28" rx="14" fill="#575ECF" opacity="0.2"/>
+    <text x="392" y="19" font-family="system-ui, sans-serif" font-size="12" fill="#7B80E0" text-anchor="middle" font-weight="600">CSV Export</text>
+
+    <rect x="450" y="0" width="120" height="28" rx="14" fill="#575ECF" opacity="0.2"/>
+    <text x="510" y="19" font-family="system-ui, sans-serif" font-size="12" fill="#7B80E0" text-anchor="middle" font-weight="600">Free &amp; Open Source</text>
+  </g>
+
+  <!-- Tech stack -->
+  <text x="195" y="225" font-family="system-ui, sans-serif" font-size="13" fill="#dcdad5" opacity="0.6">Python  |  Selenium  |  BeautifulSoup  |  Pandas  |  MIT License</text>
+
+  <!-- SoClose branding -->
+  <g transform="translate(195, 245)">
+    <text font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="13" fill="#c5c1b9" opacity="0.7">Built by</text>
+    <text x="50" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="13" fill="#FFFFFF" font-weight="700">SoClose</text>
+    <text x="100" font-family="system-ui, sans-serif" font-size="11" fill="#c5c1b9" opacity="0.5">Digital Innovation Through Automation &amp; AI</text>
+  </g>
+</svg>
