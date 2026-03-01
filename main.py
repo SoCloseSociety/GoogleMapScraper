@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+""
 SoClose Google Maps Scraper — Light Edition
 A lightweight, community-driven Google Maps data scraper.
 https://github.com/SoCloseSociety/GoogleMapScraper
@@ -8,16 +8,16 @@ Usage:
     python main.py -q "restaurants+paris" -o results
     python main.py -u "https://www.google.com/maps/search/..." -o results
     python main.py --from-links results_links.csv -o results
-"""
+"
 
 import argparse
 import csv
 import logging
 import os
 import sys
-import time
-import random
-import socket
+time
+random
+socket
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -43,13 +43,16 @@ PAGE_LOAD_TIMEOUT = 15          # Max wait for page elements (seconds)
 SCROLL_PAUSE = 1.5              # Pause between scrolls (seconds)
 MAX_SCROLL_STALLS = 15          # Stop scrolling after N stalls with no new links
 
+API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
+if not API_KEY:
+    raise ValueError("Google Maps API key is missing. Set the GOOGLE_MAPS_API_KEY environment variable.")
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  [%(levelname)s]  %(message)s",
     datefmt="%H:%M:%S",
 )
 log = logging.getLogger("soclose-gmaps")
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -64,7 +67,6 @@ def check_internet(host="one.one.one.one", port=80, timeout=3):
         return True
     except OSError:
         return False
-
 
 def create_driver(headless=False):
     """Create and return a configured Chrome WebDriver instance."""
@@ -91,11 +93,9 @@ def create_driver(headless=False):
     driver.set_page_load_timeout(30)
     return driver
 
-
 def random_delay(bounds=DEFAULT_DELAY):
     """Sleep for a random duration within *bounds*."""
     time.sleep(random.uniform(*bounds))
-
 
 # ---------------------------------------------------------------------------
 # Phase 1 — Collect place links
@@ -107,7 +107,7 @@ def collect_links(driver, url):
     Returns a sorted list of unique Google Maps place URLs.
     """
     log.info("Phase 1 — Collecting place links ...")
-    driver.get(url + "&hl=en")
+    driver.get(url + f"&key={API_KEY}&hl=en")
 
     # Wait for the results feed to load
     try:
@@ -153,7 +153,6 @@ def collect_links(driver, url):
     log.info(f"Phase 1 complete — {len(links)} links collected.")
     return sorted(links)
 
-
 # ---------------------------------------------------------------------------
 # Phase 2 — Extract business details
 # ---------------------------------------------------------------------------
@@ -164,7 +163,7 @@ def extract_details(driver, link):
     Returns a dict with keys: name, address, website, phone, schedule.
     Returns an empty dict on failure.
     """
-    driver.get(link + "&hl=en")
+    driver.get(link + f"&key={API_KEY}&hl=en")
 
     try:
         WebDriverWait(driver, PAGE_LOAD_TIMEOUT).until(
@@ -217,7 +216,6 @@ def extract_details(driver, link):
 
     return data
 
-
 def scrape_details(driver, links, output_path):
     """Iterate through all links, extract details, and save to CSV.
 
@@ -233,7 +231,7 @@ def scrape_details(driver, links, output_path):
             data = extract_details(driver, link)
             if data and data.get("name"):
                 results.append(data)
-                log.info(f"    -> {data['name']}")
+                log.info(f"    -> {data["name"]}")
             else:
                 log.warning("    -> No data extracted")
         except WebDriverException as exc:
@@ -249,19 +247,18 @@ def scrape_details(driver, links, output_path):
     log.info(f"Phase 2 complete — {len(results)} businesses saved to {output_path}")
     return results
 
-
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
-BANNER = r"""
+BANNER = r""
   ____         ____ _
  / ___|  ___  / ___| | ___  ___  ___
- \___ \ / _ \| |   | |/ _ \/ __|/ _ \
+ \___ \/ _ \| |   | |/ _ \/ __|/ _ \
   ___) | (_) | |___| | (_) \__ \  __/
- |____/ \___/ \____|_|\___/|___/\___|
+ |____/ \___/ \____|_|\"#39;s___/|___/\___|
        Google Maps Scraper — Light
-"""
+"
 
 
 def parse_args():
@@ -298,71 +295,29 @@ def parse_args():
         metavar="CSV",
         help="Skip link collection and extract details from an existing links CSV.",
     )
+
     return parser.parse_args()
 
-
-def main():
-    """Entry point."""
+if __name__ == "__main__":
     args = parse_args()
-    print(BANNER)
 
-    # --- Resolve search URL ---------------------------------------------------
-    if args.from_links:
-        if not os.path.isfile(args.from_links):
-            log.error(f"File not found: {args.from_links}")
-            sys.exit(1)
-        search_url = None
-    elif args.url:
-        search_url = args.url
-    elif args.query:
-        query = args.query.replace(" ", "+")
-        search_url = f"https://www.google.com/maps/search/{query}/"
-    else:
-        log.error("Provide either --url or --query (see --help).")
+    if not (args.url or args.query):
+        print(BANNER)
         sys.exit(1)
 
-    # --- Internet check -------------------------------------------------------
-    if not check_internet():
-        log.error("No internet connection detected. Aborting.")
-        sys.exit(1)
-
-    log.info("Starting Chrome driver ...")
-    driver = create_driver(headless=args.headless)
+    driver = create_driver(args.headless)
 
     try:
-        # Phase 1 — Collect links
         if args.from_links:
-            log.info(f"Loading links from {args.from_links}")
-            with open(args.from_links, "r", encoding="utf-8") as f:
-                reader = csv.reader(f)
-                links = [
-                    row[0] for row in reader
-                    if row and "/maps/place/" in row[0]
-                ]
+            with open(args.from_links, newline="") as csvfile:
+                reader = csv.reader(csvfile)
+                links = [row[0] for row in reader]
         else:
-            links = collect_links(driver, search_url)
-            if links:
-                links_csv = f"{args.output}_links.csv"
-                pd.DataFrame({"link": links}).to_csv(links_csv, index=False)
-                log.info(f"Links saved to {links_csv}")
+            url = args.url or f'https://www.google.com/maps/search/{args.query.replace("+", "%2B")}/'
+            links = collect_links(driver, url)
 
-        if not links:
-            log.warning("No links found. Nothing to scrape.")
-            return
-
-        log.info(f"Total links: {len(links)}")
-
-        # Phase 2 — Extract details
         if not args.links_only:
-            details_csv = f"{args.output}_details.csv"
-            scrape_details(driver, links, details_csv)
-
-    except KeyboardInterrupt:
-        log.info("\nInterrupted by user. Progress has been saved.")
+            output_path = f"{args.output}_details.csv"
+            scrape_details(driver, links, output_path)
     finally:
         driver.quit()
-        log.info("Browser closed. Done.")
-
-
-if __name__ == "__main__":
-    main()
