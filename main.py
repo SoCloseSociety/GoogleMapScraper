@@ -42,6 +42,7 @@ DEFAULT_DELAY = (2, 4)          # Random delay range between requests (seconds)
 PAGE_LOAD_TIMEOUT = 15          # Max wait for page elements (seconds)
 SCROLL_PAUSE = 1.5              # Pause between scrolls (seconds)
 MAX_SCROLL_STALLS = 15          # Stop scrolling after N stalls with no new links
+RATE_LIMIT_DELAY = 60           # Delay between requests to avoid IP blocking (seconds)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -49,6 +50,11 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 log = logging.getLogger("soclose-gmaps")
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36"
+]
 
 
 # ---------------------------------------------------------------------------
@@ -84,6 +90,7 @@ def create_driver(headless=False):
 
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=opts)
+    driver.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": random.choice(USER_AGENTS)})
 
     if not headless:
         driver.maximize_window()
@@ -148,7 +155,7 @@ def collect_links(driver, url):
         driver.execute_script(
             "arguments[0].scrollTop = arguments[0].scrollHeight", feed
         )
-        time.sleep(SCROLL_PAUSE)
+        time.sleep(SCROLL_PAUSE + random.uniform(0, 2))
 
     log.info(f"Phase 1 complete — {len(links)} links collected.")
     return sorted(links)
@@ -165,6 +172,7 @@ def extract_details(driver, link):
     Returns an empty dict on failure.
     """
     driver.get(link + "&hl=en")
+    time.sleep(RATE_LIMIT_DELAY)
 
     try:
         WebDriverWait(driver, PAGE_LOAD_TIMEOUT).until(
