@@ -238,6 +238,7 @@ def scrape_details(driver, links, output_path):
                 log.warning("    -> No data extracted")
         except WebDriverException as exc:
             log.error(f"    -> WebDriver error: {exc}")
+            continue
 
         # Save progress after each extraction (crash-safe)
         if results:
