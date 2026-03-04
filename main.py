@@ -82,7 +82,7 @@ def create_driver(headless=False):
         opts.add_argument("--headless=new")
         opts.add_argument("--window-size=1920,1080")
 
-    service = Service(ChromeDriverManager().install())
+    service = Service(ChromeDriverManager(version='latest').install())
     driver = webdriver.Chrome(service=service, options=opts)
 
     if not headless:
