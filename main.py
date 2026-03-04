@@ -82,11 +82,15 @@ def create_driver(headless=False):
         opts.add_argument("--headless=new")
         opts.add_argument("--window-size=1920,1080")
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=opts)
+    try:
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=opts)
 
-    if not headless:
-        driver.maximize_window()
+        if not headless:
+            driver.maximize_window()
+    except WebDriverException as e:
+        log.error(f'Failed to start Chrome: {e}')
+        sys.exit(1)
 
     driver.set_page_load_timeout(30)
     return driver
