@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        env:
+          PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache
+
+      - name: Run tests
+        run: |
+          pytest
+        timeout-minutes: 10
+
+      - name: Cache test results
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pytest/
+          key: ${{ runner.os }}-pytest-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pytest-
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+        env:
+          PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache
+
+      - name: Run linting
+        run: |
+          flake8 .
+        timeout-minutes: 5
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
