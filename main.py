@@ -30,6 +30,7 @@ from selenium.common.exceptions import (
     WebDriverException,
 )
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import pandas as pd
 
