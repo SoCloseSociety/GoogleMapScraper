@@ -18,6 +18,9 @@ import sys
 import time
 import random
 import socket
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -83,7 +86,11 @@ def create_driver(headless=False):
         opts.add_argument("--window-size=1920,1080")
 
     service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=opts)
+    api_key = os.getenv('API_KEY')
+if not api_key:
+    raise ValueError('API_KEY environment variable is missing')
+opts.add_argument(f'--api-key={api_key}')
+driver = webdriver.Chrome(service=service, options=opts)
 
     if not headless:
         driver.maximize_window()
